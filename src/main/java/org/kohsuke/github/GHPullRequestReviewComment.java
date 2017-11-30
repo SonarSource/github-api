@@ -21,6 +21,7 @@ package org.kohsuke.github;
 
 import java.io.IOException;
 import java.net.URL;
+import javax.annotation.CheckForNull;
 
 import static org.kohsuke.github.Previews.*;
 
@@ -37,8 +38,8 @@ public class GHPullRequestReviewComment extends GHObject implements Reactable {
     private String body;
     private GHUser user;
     private String path;
-    private int position;
-    private int originalPosition;
+    private int position = -1;
+    private int original_position = -1;
 
     public static GHPullRequestReviewComment draft(String body, String path, int position) {
         GHPullRequestReviewComment result = new GHPullRequestReviewComment();
@@ -78,12 +79,14 @@ public class GHPullRequestReviewComment extends GHObject implements Reactable {
         return path;
     }
 
-    public int getPosition() {
-        return position;
+    @CheckForNull
+    public Integer getPosition() {
+        return position == -1 ? null : position;
     }
 
+    @CheckForNull
     public int getOriginalPosition() {
-        return originalPosition;
+        return original_position == -1 ? null : original_position;
     }
 
     @Override
