@@ -21,6 +21,7 @@ package org.kohsuke.github;
 
 import java.io.IOException;
 import java.net.URL;
+import javax.annotation.CheckForNull;
 
 import static org.kohsuke.github.Previews.*;
 
@@ -28,7 +29,7 @@ import static org.kohsuke.github.Previews.*;
  * Review to the pull request
  *
  * @see GHPullRequest#listReviews()
- * @see GHPullRequest#createReview(String, GHPullRequestReviewState, GHPullRequestReviewComment...)
+ * @see GHPullRequest#createReview(String, GHPullRequestReviewComment...)
  */
 public class GHPullRequestReview extends GHObject {
     GHPullRequest owner;
@@ -68,6 +69,7 @@ public class GHPullRequestReview extends GHObject {
         return commit_id;
     }
 
+    @CheckForNull
     public GHPullRequestReviewState getState() {
         return state;
     }
@@ -86,14 +88,13 @@ public class GHPullRequestReview extends GHObject {
      */
     @Preview
     @Deprecated
-    public void submit(String body, GHPullRequestReviewState event) throws IOException {
+    public void submit(String body, GHPullRequestReviewEvent event) throws IOException {
         new Requester(owner.root).method("POST")
                 .with("body", body)
                 .with("event", event.action())
                 .withPreview("application/vnd.github.black-cat-preview+json")
                 .to(getApiRoute()+"/events",this);
         this.body = body;
-        this.state = event;
     }
 
     /**

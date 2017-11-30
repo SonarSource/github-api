@@ -19,10 +19,19 @@
  */
 package org.kohsuke.github;
 
-public enum GHPullRequestReviewState {
-    PENDING,
-    APPROVED,
-    CHANGES_REQUESTED,
-    COMMENTED,
-    DISMISSED
+public enum GHPullRequestReviewEvent {
+    PENDING(null),
+    APPROVE("APPROVE"),
+    REQUEST_CHANGES("REQUEST_CHANGES"),
+    COMMENT("COMMENT");
+
+    private final String _action;
+
+    GHPullRequestReviewEvent(String action) {
+        _action = action;
+    }
+
+    public String action() {
+        return _action;
+    }
 }
