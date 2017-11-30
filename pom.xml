@@ -1,35 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.kohsuke</groupId>
+  <parent>
+    <groupId>org.sonarsource.parent</groupId>
+    <artifactId>parent</artifactId>
+    <version>41</version>
+  </parent>
+
+  <groupId>org.sonarsource.github</groupId>
   <artifactId>github-api</artifactId>
-  <version>1.128-SNAPSHOT</version>
+  <version>1.93-SNAPSHOT</version>
   <name>GitHub API for Java</name>
-  <url>https://github-api.kohsuke.org/</url>
-  <description>GitHub API for Java</description>
+  <url>http://github-api.kohsuke.org/</url>
+  <description>SonarSource fork of GitHub API for Java</description>
 
   <scm>
-    <connection>scm:git:git@github.com/hub4j/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/hub4j/${project.artifactId}.git</developerConnection>
-    <url>https://github.com/hub4j/github-api/</url>
+    <connection>scm:git:git@github.com:SonarSource/github-api.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com:SonarSource/github-api.git</developerConnection>
+    <url>https://github.com/SonarSource/github-api.git</url>
     <tag>HEAD</tag>
   </scm>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Nexus Release Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <site>
-      <id>github-pages</id>
-      <url>gitsite:git@github.com/hub4j/${project.artifactId}.git</url>
-    </site>
-  </distributionManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -164,7 +153,7 @@
                       <exclude>org.kohsuke.github.extras.OkHttp3Connector</exclude>
                       <exclude>org.kohsuke.github.EnforcementLevel</exclude>
                       <exclude>org.kohsuke.github.GHPerson.1</exclude>
-                      
+
                       <!-- TODO: Some coverage, but more needed -->
                       <exclude>org.kohsuke.github.GHPullRequestReviewBuilder.DraftReviewComment</exclude>
                       <exclude>org.kohsuke.github.GHIssue.PullRequest</exclude>
@@ -551,185 +540,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
-  <profiles>
-    <!-- only enable slow-or-flaky-test if -Dtest= is not present -->
-    <profile>
-      <id>slow-or-flaky-test</id>
-      <activation>
-        <property>
-          <name>!test</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>slow-or-flaky-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <rerunFailingTestsCount>2</rerunFailingTestsCount>
-                  <!-- There are some tests that take longer or are a little
-                    flaky. Run them here. -->
-                  <includesFile>src/test/resources/slow-or-flaky-tests.txt</includesFile>
-                  <argLine>@{jacoco.surefire.argLine} ${surefire.argLine}</argLine>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>jdk11+</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-      <properties>
-        <!-- this is required for GithubHttpUrlConnectionClient#setRequestMethod() to work with JDK 16+ -->
-        <surefire.argLine>--add-opens java.base/java.net=ALL-UNNAMED</surefire.argLine>
-      </properties>
-    </profile>
-    <profile>
-      <id>ci-non-windows</id>
-      <activation>
-        <property>
-          <name>enable-ci</name>
-        </property>
-        <os>
-          <family>!windows</family>
-        </os>
-      </activation>
-      <properties>
-        <!-- Only fail code coverage on non-windows machines -->
-        <jacoco.haltOnFailure>true</jacoco.haltOnFailure>
-      </properties>
-    </profile>
-    <profile>
-      <id>ci-all</id>
-      <activation>
-        <property>
-          <name>enable-ci</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>com.diffplug.spotless</groupId>
-            <artifactId>spotless-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>spotless-check</id>
-                <!-- In CI, run check early in the build -->
-                <phase>process-sources</phase>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M3</version>
-            <executions>
-              <execution>
-                <id>enforce-jacoco-exist</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <requireFilesExist>
-                      <files>
-                        <file>${project.build.directory}/jacoco.exec</file>
-                      </files>
-                    </requireFilesExist>
-                  </rules>
-                  <fail>true</fail>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-                <configuration>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+
   <reporting>
     <plugins>
       <plugin>
@@ -762,21 +573,5 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <mailingLists>
-    <mailingList>
-      <name>User List</name>
-      <post>github-api@googlegroups.com</post>
-      <archive>https://groups.google.com/forum/#!forum/github-api</archive>
-    </mailingList>
-  </mailingLists>
-
-  <developers>
-    <developer>
-      <name>Kohsuke Kawaguchi</name>
-      <id>kohsuke</id>
-      <email>kk@kohsuke.org</email>
-    </developer>
-  </developers>
 
 </project>
