@@ -86,7 +86,7 @@ public class GHPullRequest extends GHIssue {
     public URL getPatchUrl() {
         return GitHub.parseURL(patch_url);
     }
-    
+
     /**
      * The URL of the patch file.
      * like https://github.com/jenkinsci/jenkins/pull/100.patch
@@ -109,7 +109,7 @@ public class GHPullRequest extends GHIssue {
     public GHCommitPointer getHead() {
         return head;
     }
-    
+
     @Deprecated
     public Date getIssueUpdatedAt() throws IOException {
         return super.getUpdatedAt();
@@ -322,6 +322,17 @@ public class GHPullRequest extends GHIssue {
                 .with("path", path)
                 .with("position", position)
                 .to(getApiRoute() + "/comments", GHPullRequestReviewComment.class).wrapUp(this);
+    }
+
+    /**
+     * Create a reply to the current comment.
+     */
+    public GHPullRequestReviewComment createReviewCommentReply(GHPullRequestReviewComment comment, String body) throws IOException {
+        return new Requester(owner.root).method("POST")
+                .with("body", body)
+                .with("in_reply_to", comment.getId())
+                .to(getApiRoute() + "/comments", GHPullRequestReviewComment.class)
+                .wrapUp(this);
     }
 
     /**
