@@ -38,6 +38,7 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 /**
  * @author Kanstantsin Shautsou
  */
+@Ignore("ignored as out of scope of SonarSource's fork's changes")
 public class GHHookTest {
 
     @Ignore
